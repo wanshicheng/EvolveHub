@@ -82,7 +82,9 @@
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <hutool.version>5.8.40</hutool.version>
         <satoken.version>1.38.0</satoken.version>
-
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.version>1.18.42</lombok.version>
+        <configuration.processor.version>3.5.3</configuration.processor.version>
         <!-- Maven plugin versions -->
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
     </properties>
@@ -193,7 +195,21 @@
                                 <artifactId>lombok</artifactId>
                                 <version>${lombok.version}</version>
                             </path>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.springframework.boot</groupId>
+                                <artifactId>spring-boot-configuration-processor</artifactId>
+                                <version>${configuration.processor.version}</version>
+                            </path>
                         </annotationProcessorPaths>
+                        <compilerArgs>
+                            <arg>-parameters</arg>
+                            <arg>-Amapstruct.defaultComponentModel=spring</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
             </plugins>
