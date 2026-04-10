@@ -23,8 +23,11 @@
   "scripts": {
     "dev": "turbo-run dev",
     "dev:ele": "pnpm -F @vben/web-ele run dev",
+    "dev:mock": "pnpm -F @vben/backend-mock run dev",
+    "dev:all": "concurrently \"pnpm run dev:mock\" \"pnpm run dev:ele\"",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 turbo build",
     "build:ele": "pnpm run build --filter=@vben/web-ele",
+    "build:mock": "pnpm run build --filter=@vben/backend-mock",
     "preview": "turbo-run preview",
     "lint": "vsh lint",
     "format": "vsh lint --format",
@@ -71,7 +74,8 @@
     "vue-tsc": "catalog:",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
-    "@tsdown/css": "catalog:"
+    "@tsdown/css": "catalog:",
+    "concurrently": "catalog:"
   },
   "engines": {
     "node": "^20.19.0 || ^22.18.0 || ^24.0.0",

@@ -20,7 +20,11 @@ overrides:
 
 catalog:
   '@ast-grep/napi': ^0.42.0
+  '@changesets/changelog-github': ^0.6.0
+  '@changesets/cli': ^2.30.0
+  '@changesets/git': ^3.0.4
   '@clack/prompts': ^1.1.0
+  concurrently: ^9.0.0
   '@commitlint/cli': ^20.5.0
   '@commitlint/config-conventional': ^20.5.0
   '@ctrl/tinycolor': ^4.2.0
