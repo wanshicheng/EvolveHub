@@ -1,13 +1,6 @@
 {
   "name": "@vben/styles",
-  "version": "5.7.0",
-  "homepage": "https://github.com/vbenjs/vue-vben-admin",
-  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vbenjs/vue-vben-admin.git",
-    "directory": "packages/styles"
-  },
+  "version": "1.0.0",
   "license": "MIT",
   "type": "module",
   "exports": {

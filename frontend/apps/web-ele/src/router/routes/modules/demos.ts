@@ -1,6 +1,6 @@
-import type { RouteRecordRaw } from 'vue-router';
+import type {RouteRecordRaw} from 'vue-router';
 
-import { $t } from '#/locales';
+import {$t} from '#/locales';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -9,6 +9,7 @@ const routes: RouteRecordRaw[] = [
       keepAlive: true,
       order: 1000,
       title: $t('demos.title'),
+      hideInMenu: true,
     },
     name: 'Demos',
     path: '/demos',

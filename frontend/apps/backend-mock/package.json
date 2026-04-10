@@ -7,6 +7,7 @@
   "author": "",
   "scripts": {
     "build": "nitro build",
+    "dev": "nitro dev",
     "start": "nitro dev"
   },
   "dependencies": {
