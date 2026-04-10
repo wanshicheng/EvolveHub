@@ -3,12 +3,12 @@ package org.evolve.auth.api;
 import cn.dev33.satoken.stp.StpUtil;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.evolve.auth.user.request.LoginRequest;
-import org.evolve.auth.user.request.RegisterRequest;
-import org.evolve.auth.user.response.LoginResponse;
-import org.evolve.auth.user.response.RegisterResponse;
-import org.evolve.auth.user.service.LoginManager;
-import org.evolve.auth.user.service.RegisterManager;
+import org.evolve.auth.request.LoginRequest;
+import org.evolve.auth.request.RegisterRequest;
+import org.evolve.auth.response.LoginResponse;
+import org.evolve.auth.response.RegisterResponse;
+import org.evolve.auth.service.LoginManager;
+import org.evolve.auth.service.RegisterManager;
 import org.evolve.common.web.response.Result;
 import org.springframework.web.bind.annotation.*;
 
