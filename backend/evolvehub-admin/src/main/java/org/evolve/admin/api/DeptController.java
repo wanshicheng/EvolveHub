@@ -4,7 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.evolve.common.model.DeptEntity;
+import org.evolve.domain.rbac.model.DeptEntity;
 import org.evolve.admin.request.CreateDeptRequest;
 import org.evolve.admin.request.UpdateDeptRequest;
 import org.evolve.admin.response.CreateDeptResponse;

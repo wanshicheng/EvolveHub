@@ -1,7 +1,7 @@
 package org.evolve.admin.service;
 
 import jakarta.annotation.Resource;
-import org.evolve.common.infra.RolePermissionsInfra;
+import org.evolve.domain.rbac.infra.RolePermissionsInfra;
 import org.evolve.common.base.BaseManager;
 import org.evolve.common.web.exception.BusinessException;
 import org.evolve.common.web.response.ResultCode;

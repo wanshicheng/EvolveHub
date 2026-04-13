@@ -4,7 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.evolve.common.model.PermissionsEntity;
+import org.evolve.domain.rbac.model.PermissionsEntity;
 import org.evolve.admin.request.CreatePermissionRequest;
 import org.evolve.admin.request.UpdatePermissionRequest;
 import org.evolve.admin.response.CreatePermissionResponse;

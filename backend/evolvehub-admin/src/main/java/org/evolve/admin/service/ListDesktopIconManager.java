@@ -3,8 +3,8 @@ package org.evolve.admin.service;
 import jakarta.annotation.Resource;
 import org.evolve.admin.response.DesktopIconResponse;
 import org.evolve.common.base.BaseManager;
-import org.evolve.common.infra.PermissionsInfra;
-import org.evolve.common.model.PermissionsEntity;
+import org.evolve.domain.rbac.infra.PermissionsInfra;
+import org.evolve.domain.rbac.model.PermissionsEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

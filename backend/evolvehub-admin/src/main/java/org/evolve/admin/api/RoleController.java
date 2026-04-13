@@ -5,7 +5,7 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.evolve.common.model.RolesEntity;
+import org.evolve.domain.rbac.model.RolesEntity;
 import org.evolve.admin.request.*;
 import org.evolve.admin.response.*;
 import org.evolve.admin.service.*;
