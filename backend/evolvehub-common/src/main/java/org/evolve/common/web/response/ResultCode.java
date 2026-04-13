@@ -44,6 +44,13 @@ public enum ResultCode {
 
     // ========== 业务逻辑 2xxx ==========
     BUSINESS_ERROR(2000, "业务逻辑错误"),
+
+    // ========== AI 模型 3xxx ==========
+    MODEL_CONNECT_FAIL(3001, "模型连通性测试失败"),
+    API_KEY_INVALID(3002, "API Key 无效或已禁用"),
+    API_KEY_ALREADY_EXIST(3003, "该用户已有 API Key"),
+    RESOURCE_GRANT_ALREADY_EXIST(3004, "授权记录已存在"),
+    RESOURCE_GRANT_NOT_EXIST(3005, "授权记录不存在"),
     ;
 
     private final int code;

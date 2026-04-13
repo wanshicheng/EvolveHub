@@ -1,32 +1,27 @@
-package org.evolve.admin.service;
+package org.evolve.aiplatform.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import jakarta.annotation.Resource;
+import org.evolve.aiplatform.request.CreateUserModelConfigRequest;
+import org.evolve.aiplatform.response.CreateUserModelConfigResponse;
 import org.evolve.common.ai.ModelConnectivityTester;
+import org.evolve.common.base.BaseManager;
 import org.evolve.common.infra.ModelConfigInfra;
 import org.evolve.common.model.ModelConfigEntity;
-import org.evolve.admin.request.CreateModelConfigRequest;
-import org.evolve.admin.response.CreateModelConfigResponse;
-import org.evolve.common.base.BaseManager;
 import org.evolve.common.web.exception.BusinessException;
 import org.evolve.common.web.response.ResultCode;
 import org.springframework.stereotype.Service;
 
 /**
- * 创建模型配置业务处理器
+ * 创建用户级模型配置业务处理器
  * <p>
- * 业务规则：
- * <ul>
- *     <li>模型名称全局唯一</li>
- *     <li>提供商不能为空</li>
- *     <li>API 密钥不能为空</li>
- * </ul>
+ * scope 固定为 USER，owner_id 为当前登录用户。
+ * </p>
  *
  * @author zhao
- * @version v1.0
- * @date 2026/4/10
  */
 @Service
-public class CreateModelConfigManager extends BaseManager<CreateModelConfigRequest, CreateModelConfigResponse> {
+public class CreateUserModelConfigManager extends BaseManager<CreateUserModelConfigRequest, CreateUserModelConfigResponse> {
 
     @Resource
     private ModelConfigInfra modelConfigInfra;
@@ -35,11 +30,8 @@ public class CreateModelConfigManager extends BaseManager<CreateModelConfigReque
     private ModelConnectivityTester modelConnectivityTester;
 
     @Override
-    protected void check(CreateModelConfigRequest request) {
-        if (modelConfigInfra.getByName(request.name()) != null) {
-            throw new BusinessException(ResultCode.DATA_ALREADY_EXIST, "模型名称已存在");
-        }
-        // 验证模型连通性：baseUrl 可达 + apiKey 有效
+    protected void check(CreateUserModelConfigRequest request) {
+        // 验证模型连通性
         ModelConnectivityTester.TestResult testResult =
                 modelConnectivityTester.test(request.provider(), request.baseUrl(), request.apiKey());
         if (!testResult.success()) {
@@ -48,7 +40,8 @@ public class CreateModelConfigManager extends BaseManager<CreateModelConfigReque
     }
 
     @Override
-    protected CreateModelConfigResponse process(CreateModelConfigRequest request) {
+    protected CreateUserModelConfigResponse process(CreateUserModelConfigRequest request) {
+        Long currentUserId = StpUtil.getLoginIdAsLong();
         ModelConfigEntity entity = new ModelConfigEntity();
         entity.setName(request.name());
         entity.setProvider(request.provider());
@@ -56,9 +49,9 @@ public class CreateModelConfigManager extends BaseManager<CreateModelConfigReque
         entity.setBaseUrl(request.baseUrl());
         entity.setEnabled(request.enabled());
         entity.setModelType(request.modelType());
-        entity.setScope("SYSTEM");
-        entity.setOwnerId(null);
+        entity.setScope("USER");
+        entity.setOwnerId(currentUserId);
         modelConfigInfra.createModelConfig(entity);
-        return new CreateModelConfigResponse(entity.getId());
+        return new CreateUserModelConfigResponse(entity.getId());
     }
 }
