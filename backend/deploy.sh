@@ -97,7 +97,7 @@ for entry in "${TARGET_SERVICES[@]}"; do
     fi
 
     log "  构建 ${name} → ${IMAGE_NAME}"
-    docker build --build-arg MODULE="${module}" -t "${IMAGE_NAME}" .
+    docker build --platform linux/amd64 --build-arg MODULE="${module}" -t "${IMAGE_NAME}" .
     ok "  ${name} 镜像构建完成"
 done
 
