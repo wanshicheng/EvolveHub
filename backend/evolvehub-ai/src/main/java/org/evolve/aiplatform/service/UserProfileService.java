@@ -2,6 +2,7 @@ package org.evolve.aiplatform.service;
 
 import jakarta.annotation.Resource;
 import org.evolve.aiplatform.utils.S3Util;
+import org.evolve.common.web.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,11 +49,11 @@ public class UserProfileService {
     public String getProfile(Long userId) {
         String key = buildKey(userId);
         try {
-            if (!s3Util.exists(key)) {
-                return null;
-            }
             byte[] data = s3Util.download(key);
             return new String(data, StandardCharsets.UTF_8);
+        } catch (BusinessException e) {
+            // 对象不存在（404），返回 null
+            return null;
         } catch (Exception e) {
             log.warn("读取用户画像失败: userId={}", userId, e);
             return null;

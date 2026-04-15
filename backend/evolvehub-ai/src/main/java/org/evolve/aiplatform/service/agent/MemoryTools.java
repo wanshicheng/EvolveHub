@@ -13,17 +13,12 @@ import java.util.List;
  * 每次对话构建 Agent 时，按当前用户/会话实例化并注册到 Toolkit。
  * </p>
  *
+ * @param chatMemoryService 长期记忆服务
+ * @param userId            当前用户 ID
+ * @param sessionId         当前会话 ID
  * @author zhao
  */
 public record MemoryTools(ChatMemoryService chatMemoryService, Long userId, Long sessionId) {
-
-    /**
-     * @param chatMemoryService 长期记忆服务
-     * @param userId            当前用户 ID
-     * @param sessionId         当前会话 ID
-     */
-    public MemoryTools {
-    }
 
     /**
      * 检索长期记忆

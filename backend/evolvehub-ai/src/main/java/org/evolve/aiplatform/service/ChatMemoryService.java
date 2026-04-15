@@ -12,7 +12,6 @@ import io.agentscope.core.model.ChatResponse;
 import io.agentscope.core.rag.model.Document;
 import io.agentscope.core.rag.model.DocumentMetadata;
 import io.agentscope.core.rag.store.MilvusStore;
-import io.agentscope.core.rag.store.dto.SearchDocumentDto;
 import io.milvus.v2.client.MilvusClientV2;
 import io.milvus.v2.service.vector.request.UpsertReq;
 import io.milvus.v2.service.vector.request.QueryReq;
@@ -276,8 +275,11 @@ public class ChatMemoryService {
 
     /**
      * 记忆提取项（文本 + 重要性评分）
+     *
+     * @param text       记忆内容
+     * @param importance 重要性评分（0.0~1.0）
      */
-    private record MemoryItem(String text, double importance) {}
+    record MemoryItem(String text, double importance) {}
 
     /**
      * 调用 LLM 从对话中提取值得记忆的内容（含重要性评分）

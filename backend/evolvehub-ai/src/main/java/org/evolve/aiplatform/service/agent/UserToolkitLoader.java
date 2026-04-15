@@ -3,6 +3,7 @@ package org.evolve.aiplatform.service.agent;
 import io.agentscope.core.tool.Toolkit;
 import io.agentscope.core.tool.mcp.McpClientBuilder;
 import io.agentscope.core.tool.mcp.McpClientWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.evolve.aiplatform.service.ChatMemoryService;
 import org.evolve.aiplatform.service.UserProfileService;
@@ -46,6 +47,9 @@ public class UserToolkitLoader {
 
     @Resource
     private UserProfileService userProfileService;
+
+    @Resource
+    private ObjectMapper objectMapper;
 
     /**
      * 为指定用户构建 Toolkit（含记忆工具 + MCP 服务 + Skill 技能）
@@ -165,8 +169,7 @@ public class UserToolkitLoader {
         }
 
         try {
-            com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
-            var configNode = om.readTree(skill.getConfig());
+            var configNode = objectMapper.readTree(skill.getConfig());
             String serverUrl = configNode.has("serverUrl") ? configNode.get("serverUrl").asText() : null;
             String protocol = configNode.has("protocol") ? configNode.get("protocol").asText() : "sse";
 

@@ -59,8 +59,53 @@ public class SendMessageManager {
 
     /**
      * 默认系统提示词
+     * <p>
+     * 定义 Agent 的身份、记忆使用策略、工具调用指导和沟通风格。
+     * 运行时会在此基础上追加长期记忆和用户画像（MEMORY.md）。
+     * </p>
      */
-    private static final String DEFAULT_SYS_PROMPT = "你是一个有帮助的 AI 助手。";
+    private static final String DEFAULT_SYS_PROMPT = """
+            你是 EvolveHub 智能助手，一个具备长期记忆和工具调用能力的 AI。你能够记住用户的偏好和历史，并通过外部工具为用户提供更深入的帮助。
+            
+            ## 核心能力
+            你拥有以下工具，请在合适的时机主动使用：
+            
+            ### 记忆工具
+            - **recall_memory**：从长期记忆中检索与用户相关的信息。在以下场景主动调用：
+              - 用户提到"之前说过""上次聊的""你还记得吗"等回溯性表述
+              - 需要了解用户的偏好、背景或历史决策来给出更好的回答
+              - 新会话开始时，可用用户的问题作为 query 检索相关记忆
+            - **save_memory**：保存值得长期记忆的信息。在以下场景主动调用：
+              - 用户明确告知个人信息（姓名、职业、技术栈、偏好等）
+              - 用户做出重要决策或表达强烈偏好
+              - 用户纠正你的错误认知（保存正确信息）
+              - 内容应为一句简洁的陈述句，如"用户偏好使用 PostgreSQL 而非 MySQL"
+              - 不要保存临时性、一次性的对话内容
+            
+            ### 用户画像工具
+            - **read_user_profile**：读取用户的个人画像文件，了解其完整背景
+            - **update_user_profile**：当积累了足够多的用户信息后，整理为结构化的 Markdown 画像并更新
+            - **append_user_profile**：向画像追加新发现的用户信息
+            - 画像应包含：基本信息、技术背景、工作领域、沟通偏好、重要决策记录等
+            - 不要频繁更新画像，当积累了 3 条以上新信息时再考虑追加
+            
+            ### 外部工具（MCP 服务 / Skill 技能）
+            - 你可能还注册了用户配置的 MCP 服务和 Skill 技能（如搜索、代码执行、数据查询等）
+            - 当用户的问题超出你的知识范围或需要实时数据时，优先使用这些工具
+            - 调用工具前简要告知用户你准备做什么，调用后清晰呈现结果
+            
+            ## 行为准则
+            1. **主动记忆**：对话中发现用户的重要信息时，主动保存记忆，无需征求用户同意
+            2. **自然引用**：引用记忆中的信息时，自然地融入回答，不要说"根据我的记忆数据库"
+            3. **诚实透明**：不确定的事情如实说明，不编造信息；使用工具失败时告知用户
+            4. **简洁高效**：回答要有针对性，避免不必要的冗长；代码问题给代码，决策问题给分析
+            5. **尊重用户**：始终以用户的需求为导向，记住并尊重用户表达过的偏好
+            
+            ## 沟通风格
+            - 默认使用中文交流，除非用户使用其他语言
+            - 技术讨论时精确具体，给出可执行的方案而非泛泛建议
+            - 语气友好专业，不过度热情也不过于机械
+            """;
 
     /**
      * 异步执行流式推送的线程池
@@ -194,11 +239,10 @@ public class SendMessageManager {
             } catch (Exception e) {
                 log.warn("长期记忆检索失败，继续对话", e);
             }
-            List<Msg> messages = buildContextMessages(session, userMsg, memories);
+            List<Msg> messages = buildContextMessages(session, userMsg);
 
-            // 6. 构建系统提示词（已包含在 messages 的第一条 SYSTEM 消息中）
-            String sysPrompt = (session.getSysPrompt() != null && !session.getSysPrompt().isBlank())
-                    ? session.getSysPrompt() : DEFAULT_SYS_PROMPT;
+            // 6. 构建系统提示词（含长期记忆 + 用户画像）
+            String sysPrompt = buildEnrichedSysPrompt(session, memories);
 
             // 7. 构建 Agent（含 Model + Toolkit + sysPrompt）
             ReActAgent agent = chatAgentFactory.createAgent(
@@ -401,17 +445,16 @@ public class SendMessageManager {
     }
 
     /**
-     * 组装上下文消息列表（system + 摘要 + 历史 + 当前用户消息）
+     * 构建完整的系统提示词（基础 sysPrompt + 长期记忆 + 用户画像）
+     * <p>
+     * 该提示词传给 ReActAgent，由 Agent 内部作为 SYSTEM 消息注入，避免与 messages 中的内容重复。
+     * </p>
      */
-    private List<Msg> buildContextMessages(ChatSessionEntity session, ChatMessageEntity userMsg,
-                                              List<String> memories) {
-        List<Msg> messages = new ArrayList<>();
-
-        // 系统提示词
+    private String buildEnrichedSysPrompt(ChatSessionEntity session, List<String> memories) {
         String sysPrompt = (session.getSysPrompt() != null && !session.getSysPrompt().isBlank())
                 ? session.getSysPrompt() : DEFAULT_SYS_PROMPT;
 
-        // 注入长期记忆到系统提示词
+        // 注入长期记忆
         if (memories != null && !memories.isEmpty()) {
             StringBuilder memoryBlock = new StringBuilder();
             memoryBlock.append("\n\n以下是你对该用户的了解（长期记忆），请在回答时参考：\n");
@@ -427,10 +470,17 @@ public class SendMessageManager {
             sysPrompt = sysPrompt + "\n\n以下是该用户的个人画像：\n" + userProfile;
         }
 
-        messages.add(Msg.builder()
-                .role(MsgRole.SYSTEM)
-                .textContent(sysPrompt)
-                .build());
+        return sysPrompt;
+    }
+
+    /**
+     * 组装上下文消息列表（摘要 + 历史消息）
+     * <p>
+     * 注意：系统提示词由 ReActAgent 内部注入，此处不再重复添加。
+     * </p>
+     */
+    private List<Msg> buildContextMessages(ChatSessionEntity session, ChatMessageEntity userMsg) {
+        List<Msg> messages = new ArrayList<>();
 
         // 注入上下文摘要（短期记忆压缩，优先从 Redis 读取）
         String contextSummary = chatContextCacheService.getSummary(session.getUserId(), session.getId());
